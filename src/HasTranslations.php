@@ -97,7 +97,6 @@ trait HasTranslations
                     is_null(json_decode($rawValue, true)) &&
                     json_last_error() !== JSON_ERROR_NONE
                 ) {
-                    dd($rawValue);
                     $translation = $rawValue;
 
                 } else {
