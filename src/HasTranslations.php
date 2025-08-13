@@ -88,8 +88,27 @@ trait HasTranslations
         if (is_null(self::getAttributeFromArray($baseKey))) {
             $translation = null;
         } else {
-            $translation = isset($translations[$normalizedLocale]) ? $translations[$normalizedLocale] : null;
-            $translation ??= ($translatableConfig->allowNullForTranslation) ? null : '';
+               $rawValue = self::getAttributeFromArray($baseKey);
+
+               if (
+                    $useFallbackLocale &&
+                    !is_null($rawValue) &&
+                    is_string($rawValue) &&
+                    is_null(json_decode($rawValue, true)) &&
+                    json_last_error() !== JSON_ERROR_NONE
+                ) {
+                    dd($rawValue);
+                    $translation = $rawValue;
+
+                } else {
+                    $translation = $translations[$normalizedLocale] ?? null;
+
+                    if ($translation === null && $useFallbackLocale && $locale !== $normalizedLocale) {
+                        $translation = $translations[$locale] ?? null;
+                    }
+
+                    $translation ??= ($translatableConfig->allowNullForTranslation) ? null : '';
+                }
         }
 
         if ($isKeyMissingFromLocale && $translatableConfig->missingKeyCallback) {
